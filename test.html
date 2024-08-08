@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>3D Model Showcase</title>
+    <style>
+        body { 
+            margin: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #121212;
+            color: #ffffff;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+        }
+        h1 {
+            margin-top: 20px;
+            /* color: #bb86fc; */
+			color: skyblue;
+        }
+        .container {
+            display: flex;
+            flex-direction: row;
+            justify-content: space-between;
+            align-items: flex-start;
+            width: 90%;
+            max-width: 1800px;
+            background: #1e1e1e;
+            padding: 20px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+            border-radius: 8px;
+            margin-top: 20px;
+        }
+        #3dviewer {
+            border: 1px solid #333;
+			border-radius: 8px !important;
+        }
+        .info {
+            width: 35%;
+            padding: 20px;
+            background: #2b2b2b;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+			margin-right: 8px;
+        }
+        .info h2 {
+            /* color: #bb86fc; */
+			color: skyblue;
+            margin-bottom: 10px;
+        }
+        .info p {
+            margin: 10px 0;
+        }
+        .info strong {
+            color: #ffffff;
+        }
+		canvas {
+			border-radius: 8px !important;
+		}
+    </style>
+</head>
+<body>
+    <h1>3D Model Showcase</h1>
+    <div class="container">
+        <div class="info">
+            <h2>Model Information</h2>
+            <p><strong>File Name:</strong> test.glb</p>
+            <p><strong>File Size:</strong> 1.2 MB</p>
+            <p><strong>Dimensions:</strong> 10x10x10 units</p>
+
+            <h2>Author Information</h2>
+            <p><strong>Name:</strong> John Doe</p>
+            <p><strong>Email:</strong> john.doe@example.com</p>
+            <p><strong>Website:</strong> www.johndoe.com</p>
+			<p><strong>Name:</strong> John Doe</p>
+            <p><strong>Email:</strong> john.doe@example.com</p>
+            <p><strong>Website:</strong> www.johndoe.com</p>
+			<p><strong>Name:</strong> John Doe</p>
+            <p><strong>Email:</strong> john.doe@example.com</p>
+            <p><strong>Website:</strong> www.johndoe.com</p>
+			<p><strong>Name:</strong> John Doe</p>
+            <p><strong>Email:</strong> john.doe@example.com</p>
+            <p><strong>Website:</strong> www.johndoe.com</p>
+        </div>
+        <div id="3dviewer"></div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
+    <script defer>
+        // Ensure the DOM is fully loaded before running the script
+        window.addEventListener('DOMContentLoaded', () => {
+            // Basic setup
+            const container = document.getElementById("3dviewer");
+
+            if (!container) {
+                console.log("container was null");
+                return;
+            }
+
+            const info = document.querySelector('.info');
+
+            // Adjust the 3D viewer container size
+            function adjustViewerSize() {
+                container.style.width = (info.parentElement.clientWidth - info.clientWidth - 40) + 'px'; // 40px for padding/margin
+                container.style.height = info.clientHeight + 'px';
+            }
+
+            adjustViewerSize();
+            window.addEventListener('resize', adjustViewerSize);
+
+            console.log("container size:", container.clientWidth, container.clientHeight);
+
+            const scene = new THREE.Scene();
+            scene.background = new THREE.Color("#2b2b2b"); // Dark background
+
+            const camera = new THREE.PerspectiveCamera(75, container.clientWidth / container.clientHeight, 0.1, 1000);
+            const renderer = new THREE.WebGLRenderer();
+            renderer.setSize(container.clientWidth, container.clientHeight);
+            container.appendChild(renderer.domElement);
+
+            // Orbit controls
+            const controls = new THREE.OrbitControls(camera, renderer.domElement);
+
+            // Lighting setup
+            const ambientLight = new THREE.AmbientLight(0xffffff, 1.5); // Strong ambient light
+            scene.add(ambientLight);
+
+            const directionalLight1 = new THREE.DirectionalLight(0xffffff, 1);
+            directionalLight1.position.set(1, 1, 1).normalize();
+            scene.add(directionalLight1);
+
+            const directionalLight2 = new THREE.DirectionalLight(0xffffff, 1);
+            directionalLight2.position.set(-1, 1, -1).normalize();
+            scene.add(directionalLight2);
+
+            const directionalLight3 = new THREE.DirectionalLight(0xffffff, 1);
+            directionalLight3.position.set(-1, -1, 1).normalize();
+            scene.add(directionalLight3);
+
+            const directionalLight4 = new THREE.DirectionalLight(0xffffff, 1);
+            directionalLight4.position.set(1, -1, -1).normalize();
+            scene.add(directionalLight4);
+
+            // Load GLTF model
+            const loader = new THREE.GLTFLoader();
+            loader.load('test.glb', function (gltf) {
+                scene.add(gltf.scene);
+                console.log("Model loaded successfully");
+                animate();
+            }, undefined, function (error) {
+                console.error("An error happened", error);
+            });
+
+            camera.position.z = 5;
+
+            // Rendering loop
+            function animate() {
+                requestAnimationFrame(animate);
+                controls.update();
+                renderer.render(scene, camera);
+            }
+
+            // Prevent right-click and context menu
+            document.addEventListener('contextmenu', event => event.preventDefault());
+
+            // Debugging: Add an axis helper
+            //const axesHelper = new THREE.AxesHelper(5);
+            //scene.add(axesHelper);
+        });
+    </script>
+</body>
+</html>
