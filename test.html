@@ -93,6 +93,11 @@
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
     <script defer>
         // Ensure the DOM is fully loaded before running the script
+		
+		let userInteracting = false;
+		let spinTimeout;
+
+		
         window.addEventListener('DOMContentLoaded', () => {
             // Basic setup
             const container = document.getElementById("3dviewer");
@@ -125,6 +130,19 @@
 
             // Orbit controls
             const controls = new THREE.OrbitControls(camera, renderer.domElement);
+			
+			// spinning events
+			controls.addEventListener('start', () => {
+				userInteracting = true;
+				clearTimeout(spinTimeout);
+			});
+			controls.addEventListener('end', () => {
+				clearTimeout(spinTimeout);
+				spinTimeout = setTimeout(() => {
+					userInteracting = false;
+				}, 2000); // Adjust the delay (in milliseconds) as needed
+			});
+
 
             // Lighting setup
             const ambientLight = new THREE.AmbientLight(0xffffff, 1.5); // Strong ambient light
@@ -158,12 +176,17 @@
 
             camera.position.z = 5;
 
-            // Rendering loop
-            function animate() {
-                requestAnimationFrame(animate);
-                controls.update();
-                renderer.render(scene, camera);
-            }
+            // Rendering loop			
+			function animate() {
+				requestAnimationFrame(animate);
+
+				if (!userInteracting) {
+					scene.rotation.y += 0.01; // Adjust the rotation speed as needed
+				}
+
+				controls.update();
+				renderer.render(scene, camera);
+			}
 
             // Prevent right-click and context menu
             document.addEventListener('contextmenu', event => event.preventDefault());
